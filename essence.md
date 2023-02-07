@@ -1,4 +1,4 @@
-# Way of Working: Project 1 - DECIDE
+# Way of Working: Project 2 - CI Server
 
 - [ ] Principles established
     - [ ] Principles and constraints are committed to by the team
