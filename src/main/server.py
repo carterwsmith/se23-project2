@@ -1,6 +1,6 @@
 from flask import Flask, make_response, request, jsonify
 from git import Repo
-import json, os, shutil
+import json, os, shutil, pytest
 
 from utils import parse_github_payload, check_py_syntax, change_commit_status
 
@@ -23,8 +23,11 @@ def process_github_request():
                 CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
             )
 
-            # Compile and check syntax of all .py files in the cloned directory
-            SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
+            pytest_args = [
+                './tmp/src/test',
+            ]
+            TEST_CODE = pytest.main(pytest_args)
+            TEST_RESULT = True if TEST_CODE == pytest.ExitCode.OK else False
 
             # Remove temp directory when done
             shutil.rmtree(CLONE_DIR)
