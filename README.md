@@ -22,4 +22,6 @@ Run the server with `flask --app src/main/server.py run -p {PORT}` from the root
 
 To host the server yourself, use `ngrok http {PORT}` and copy the forwarding URL into a GitHub webhook.
 
+You will also need to create a `src/.env` file containing a `GITHUB_ACCESS_TOKEN` variable with `repo:status` permission to set the commit status.
+
 To run tests locally, run `python3 -m pytest` from the root directory.

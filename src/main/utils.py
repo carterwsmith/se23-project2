@@ -1,6 +1,7 @@
 import time, requests
+from dotenv import load_dotenv, find_dotenv
 from py_compile import compile
-from os import listdir
+from os import listdir, getenv
 from os.path import isfile, join
 
 def check_py_syntax(F_PATH):
@@ -32,9 +33,12 @@ def parse_github_payload(json):
         raise Exception("Error parsing GitHub payload: {}".format(e))
 
 def change_commit_status(OWNER_NAME, REPO_NAME, SHA, STATUS):
+    load_dotenv(find_dotenv())
+    TOKEN = getenv("GITHUB_ACCESS_TOKEN")
+
     url = 'https://api.github.com/repos/'+OWNER_NAME+'/'+REPO_NAME+'/statuses/'+SHA
     if STATUS == "success": payload = {"state" : STATUS, "description" : "The build and tests succeeded."}
     else: payload = {"state" : STATUS, "description" : "The build or tests failed."}
-    headers = {"Authorization" : "token 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"}
+    headers = {"Authorization" : f"token {TOKEN}"}
 
     req = requests.post(url, json = payload, headers = headers)
