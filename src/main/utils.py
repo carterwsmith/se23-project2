@@ -1,4 +1,4 @@
-import time
+import time, requests
 from py_compile import compile
 from os import listdir
 from os.path import isfile, join
@@ -25,7 +25,14 @@ def parse_github_payload(json):
         output['pusher_name'] = json["pusher"]["name"]
         output['url'] = data["owner"]["url"]
         output['clone_url'] = data["clone_url"]
+        output['sha'] = json['after']
 
         return output
     except Exception as e:
         raise Exception("Error parsing GitHub payload: {}".format(e))
+
+def change_commit_status(OWNER_NAME, REPO_NAME, SHA, STATUS):
+    url = 'https://api.github.com/repos/'+OWNER_NAME+'/'+REPO_NAME+'/statuses/'+SHA
+    payload = {"state" : STATUS}
+
+    requests.post(url, json = payload)
