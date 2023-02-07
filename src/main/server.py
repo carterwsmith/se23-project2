@@ -13,7 +13,7 @@ def process_github_request():
             return payload
         except Exception as e:
             return "Error: {}".format(e)
-    elif request.headers["X-GitHub-Event"] == "ping":
+    elif "X-GitHub-Event" in request.headers and request.headers["X-GitHub-Event"] == "ping":
         return make_response("GitHub ping successful", 200)
     else:
         return make_response("Not a GitHub request", 404)
