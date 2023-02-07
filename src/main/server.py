@@ -23,6 +23,9 @@ def process_github_request():
                 CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
             )
 
+            # Compile and check syntax of all .py files in the cloned directory
+            SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
+
             pytest_args = [
                 './tmp/src/test',
             ]
@@ -32,7 +35,7 @@ def process_github_request():
             # Remove temp directory when done
             shutil.rmtree(CLONE_DIR)
 
-            conditions = [SYNTAX_CHECK]
+            conditions = [SYNTAX_CHECK, TEST_RESULT]
             if all(conditions): STATUS = "success"
             else: STATUS = "failure"
             change_commit_status(OWNER_NAME=payload_data["owner_name"], 
