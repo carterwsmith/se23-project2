@@ -21,3 +21,5 @@ To activate the CI when already hosted, push a change to the repository.
 Run the server with `flask --app src/main/server.py run -p {PORT}` from the root directory.
 
 To host the server yourself, use `ngrok http {PORT}` and copy the forwarding URL into a GitHub webhook.
+
+To run tests locally, run `python3 -m pytest` from the root directory.
