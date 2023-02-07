@@ -2,7 +2,7 @@ from flask import Flask, make_response, request, jsonify
 from git import Repo
 import json, os, shutil
 
-from utils import parse_github_payload, check_py_syntax
+from utils import parse_github_payload, check_py_syntax, change_commit_status
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
@@ -28,6 +28,14 @@ def process_github_request():
 
             # Remove temp directory when done
             shutil.rmtree(CLONE_DIR)
+
+            conditions = [SYNTAX_CHECK]
+            if all(conditions): STATUS = "success"
+            else: STATUS = "failure"
+            change_commit_status(OWNER_NAME=payload_data["owner_name"], 
+                                REPO_NAME=payload_data["repo_name"], 
+                                SHA=payload_data["sha"], 
+                                STATUS=STATUS)
 
             return make_response(jsonify(payload_data), 200)
         except Exception as e:
