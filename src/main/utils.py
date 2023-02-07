@@ -35,6 +35,6 @@ def change_commit_status(OWNER_NAME, REPO_NAME, SHA, STATUS):
     url = 'https://api.github.com/repos/'+OWNER_NAME+'/'+REPO_NAME+'/statuses/'+SHA
     if STATUS == "success": payload = {"state" : STATUS, "description" : "The build and tests succeeded."}
     else: payload = {"state" : STATUS, "description" : "The build or tests failed."}
-    headers = {"Authorization" : "Bearer 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"}
+    headers = {"Authorization" : "token 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"}
 
     req = requests.post(url, json = payload, headers = headers)
