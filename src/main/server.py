@@ -1,16 +1,32 @@
 from flask import Flask, make_response, request, jsonify
 from git import Repo
-import json
+import json, os, shutil
+
+from utils import parse_github_payload
 
 app = Flask(__name__)
-clone_dir = "./clone_dir"
+CLONE_DIR = "./tmp/"
 
 @app.route("/", methods=["GET", "POST"])
 def process_github_request():
     if "X-GitHub-Event" in request.headers and request.headers["X-GitHub-Event"] == "push":
         try:
-            payload = request.json
-            return payload
+            # Remove temp directory if it exists already
+            if os.path.exists(CLONE_DIR): shutil.rmtree(CLONE_DIR)
+
+            payload_data = parse_github_payload(request.json)
+
+            COMMIT_BRANCH = payload_data["branch"]
+            CLONE_URL = payload_data["clone_url"]
+            
+            Repo.clone_from(
+                CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
+            )
+
+            # Remove temp directory when done
+            shutil.rmtree(CLONE_DIR)
+
+            return make_response(jsonify(payload_data), 200)
         except Exception as e:
             return "Error: {}".format(e)
     elif "X-GitHub-Event" in request.headers and request.headers["X-GitHub-Event"] == "ping":
