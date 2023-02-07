@@ -1,4 +1,16 @@
 import time
+from py_compile import compile
+from os import listdir
+from os.path import isfile, join
+
+def check_py_syntax(F_PATH):
+    py_paths = [f for f in listdir(F_PATH) if isfile(join(F_PATH, f)) and f.endswith('.py')]
+    for py_path in py_paths:
+        try:
+            compile(py_path)
+        except Exception as e:
+            return False
+    return True
 
 def parse_github_payload(json):
     try:

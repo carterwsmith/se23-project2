@@ -2,7 +2,7 @@ from flask import Flask, make_response, request, jsonify
 from git import Repo
 import json, os, shutil
 
-from utils import parse_github_payload
+from utils import parse_github_payload, check_py_syntax
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
@@ -22,6 +22,9 @@ def process_github_request():
             Repo.clone_from(
                 CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
             )
+
+            # Compile and check syntax of all .py files in the cloned directory
+            SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
 
             # Remove temp directory when done
             shutil.rmtree(CLONE_DIR)
