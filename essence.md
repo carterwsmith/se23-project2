@@ -1,5 +1,13 @@
 # Way of Working: Project 2 - CI Server
 
+At the initial meeting  for this project that took place through discord we decided to have a proper first meeting in person where we would start work on the project. At the in person meeting,  it was decided that we were gonna use python and flask for the project instead of java. Given that we used python for the assignment before and it went well and the fact that some had a lot of experience working with flask it made sense to switch.  Most of the time during the first in person meeting was spent to set up the project and it was decided that another meeting was necessary the day after.
+
+We met the day after and started proper work on the project. Carter, Sanjin and David were in charge of the actual coding during this project while Alex and Minhao were tasked with the documentation. As in the previous project people were allowed to make issues and or assign themselves to whichever issue they wanted to work on. After someone was assigned to an issue they made their own branch to work in and made a PR when done. 
+
+Communication happened through discord. What was different this time is that the group did some mob programming during one of the meetings.
+
+
+
 - [ ] Principles established
     - [ ] Principles and constraints are committed to by the team
     - [ ] Principles and constraints are agreed to by stakeholders
