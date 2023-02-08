@@ -72,7 +72,7 @@ SOFTWARE.
 - Sanjin Redzepagic
 
 - Minhao Ni
-    
+    - Wrote documentation for the application files
 
 - Alexander Gustavsson
     - Worked on the README
