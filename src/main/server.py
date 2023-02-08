@@ -12,10 +12,45 @@ from flask import Flask, make_response, request, jsonify
 from git import Repo, rmtree
 import json, os, shutil, subprocess, pytest, sys, traceback
 
-from utils import parse_github_payload, check_py_syntax, change_commit_status
+from utils import parse_github_payload, check_py_syntax, change_commit_status, store_ci_result
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
+HISTORY_DIR = "./history"
+HISTORY_FILE = "ci.history"
+
+
+@app.route("/history", methods=["GET"])
+def show_ci_history():
+    """
+    This function implements the <url>/history page, which shows the results of
+    CI jobs the server has performed.
+    @return http response 200 with the history on record
+            or http response 400 if there is none
+    """
+    try:
+        with open(HISTORY_DIR + "/" + HISTORY_FILE, "r", encoding="utf-8") as f:
+            records = f.readlines()
+            vis = "<br/>".join(records)
+            return make_response(vis, 200)
+    except OSError:  # file doesn't exist
+        return make_response("No history available", 400)
+
+
+@app.route("/history/<hash>", methods=["GET"])
+def show_job_info(hash):
+    """
+    This funciton loads the ci info of a specific job given by the hash.
+    @param1 hash the hash/filename of a job.
+    @return http response 200 with the info of this job as an HTML string
+            or http response 404 if the server has no record of this job
+    """
+    try:
+        with open(HISTORY_DIR + f"/{hash}", "r", encoding="utf-8") as f:
+            page = f.readlines()
+            return make_response("\n".join(page), 200)
+    except OSError:
+        return make_response("Job not found", 404)
 
 
 """
@@ -52,11 +87,12 @@ def process_github_request():
             # Compile and check syntax of all .py files in the cloned directory
             SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
             TMP_TEST_PATH = CLONE_DIR + "src/test"
-            
+
             # Invoke tests with subprocess and get result of the tests
             test_output = subprocess.run(["python", "-m", "pytest", TMP_TEST_PATH], capture_output=True)
+            test_logs = test_output.stdout.decode("utf-8")
             TEST_RESULT = False
-            if "passed" in test_output.stdout.decode("utf-8") and "failed" not in test_output.stdout.decode("utf-8"):
+            if "passed" in test_logs and "failed" not in test_logs:
                 TEST_RESULT = True
 
             # Remove temp directory when done
@@ -72,6 +108,8 @@ def process_github_request():
                                  REPO_NAME=payload_data["repo_name"],
                                  SHA=payload_data["sha"],
                                  STATUS=STATUS)
+
+            store_ci_result(HISTORY_DIR, HISTORY_FILE, request.json, test_logs, STATUS)
 
             return make_response(jsonify(payload_data), 200)
         except Exception as e:
