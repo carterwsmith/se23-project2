@@ -35,6 +35,12 @@ Depending on your machine, you may need to use `pip3`.
 
 To activate the CI when already hosted, push a change to the repository.
 
+To access CI job history, visit the `/history` route of the server.
+
+To read documentation in a browsable format, run `python -m pydoc -b`.
+
+#### Hosting
+
 Run the server with `flask --app src/main/server.py run -p {PORT}` from the root directory.
 
 To host the server yourself, use `ngrok http {PORT}` and copy the forwarding URL into a GitHub webhook.
@@ -42,5 +48,3 @@ To host the server yourself, use `ngrok http {PORT}` and copy the forwarding URL
 You will also need to create a `src/.env` file containing a `GITHUB_ACCESS_TOKEN` variable with `repo:status` permission to set the commit status.
 
 To run tests locally, run `python -m pytest` from the root directory.
-
-To access CI job history, visit the `/history` route of the server.
