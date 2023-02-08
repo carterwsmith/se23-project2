@@ -4,11 +4,11 @@ CI server.
 """
 
 import time, requests
-import datetime
+from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
 from py_compile import compile
-from os import listdir, getenv
-from os.path import isfile, join
+from os import listdir, getenv, makedirs
+from os.path import isfile, join, exists
 
 
 """
@@ -42,10 +42,12 @@ def store_ci_result(directory, list_file, webhook_json, test_logs, result):
     commit_info = webhook_json["head_commit"]
     name = webhook_json["repository"]["full_name"]
     color = "color:Green;" if result == "success" else "color:Red;"
+    if not exists(directory):
+        makedirs(directory)
     # "a+" should guarantee that the file is created if it doesn't exist
     with open(directory + "/" + list_file, "a+", encoding="utf-8") as f:
         f.write(f'<p style=\"display:inline\">'
-                f'<a href=\"/{webhook_json["after"]}\">{name}</a> '
+                f'<a href=\"/history/{webhook_json["after"]}\">{name}</a> '
                 f'by {commit_info["author"]["username"]} at '
                 f'{commit_info["timestamp"]}: '
                 f'<span style=\"{color}\">{result}</span></p>\n')
@@ -53,12 +55,14 @@ def store_ci_result(directory, list_file, webhook_json, test_logs, result):
             directory + f"/{webhook_json['after']}",
             "w+",
             encoding="utf-8") as f:
-        job_html = f"<h1>{webhook_json['repository']['full_name']}</h1>"
-        + f"<a href=\"{commit_info['url']}\">View on GitHub</a>"
-        + f"<p>Job finished at {str(datetime.now())}</p>"
-        + "<h2>Test logs</h2>"
-        + f"<p style={color}>{test_logs}</p>"
-        + f"<p style={color}>Status: {result}</p>"
+        newline = "\n"  # f-strings can't include backslashes *apparently*
+        # But these right here sure look like backslashes to me .-.
+        job_html = f"""<h1>{webhook_json['repository']['full_name']}</h1>
+        <a href=\"{commit_info['url']}\">View on GitHub</a>
+        <p>Job finished at {str(datetime.now())}</p>
+        <h2>Test logs</h2>
+        <p style={color}>{test_logs.replace(newline, '<br/>')}</p>
+        <p style={color}>Status: {result}</p>"""
         f.write(job_html)
 
 

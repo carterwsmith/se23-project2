@@ -10,9 +10,9 @@ where the change has been made.
 
 from flask import Flask, make_response, request, jsonify
 from git import Repo, rmtree
-import json, os, shutil, subprocess, pytest, traceback
+import json, os, shutil, subprocess, pytest, sys, traceback
 
-from .utils import parse_github_payload, check_py_syntax, change_commit_status, store_ci_result
+from utils import parse_github_payload, check_py_syntax, change_commit_status, store_ci_result
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
@@ -29,7 +29,7 @@ def show_ci_history():
             or http response 400 if there is none
     """
     try:
-        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+        with open(HISTORY_DIR + "/" + HISTORY_FILE, "r", encoding="utf-8") as f:
             records = f.readlines()
             vis = "<br/>".join(records)
             return make_response(vis, 200)
@@ -37,7 +37,7 @@ def show_ci_history():
         return make_response("No history available", 400)
 
 
-@app.route("/history/<str:hash>", methods=["GET"])
+@app.route("/history/<hash>", methods=["GET"])
 def show_job_info(hash):
     """
     This funciton loads the ci info of a specific job given by the hash.
@@ -47,7 +47,8 @@ def show_job_info(hash):
     """
     try:
         with open(HISTORY_DIR + f"/{hash}", "r", encoding="utf-8") as f:
-            return make_response(f.readall(), 200)
+            page = f.readlines()
+            return make_response("\n".join(page), 200)
     except OSError:
         return make_response("Job not found", 404)
 
@@ -77,14 +78,22 @@ def process_github_request():
                 CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
             )
 
+            # Change commit status to pending when building and testing
+            change_commit_status(OWNER_NAME=payload_data["owner_name"],
+                                 REPO_NAME=payload_data["repo_name"],
+                                 SHA=payload_data["sha"],
+                                 STATUS="pending")
+
             # Compile and check syntax of all .py files in the cloned directory
             SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
+            TMP_TEST_PATH = CLONE_DIR + "src/test"
 
             # Invoke tests with subprocess and get result of the tests
-            tmp_test_path = CLONE_DIR + "src/test"
-            test_code = pytest.main([tmp_test_path])
-            TEST_RESULT = True if test_code == 0 else False
-            test_logs = ""
+            test_output = subprocess.run(["python", "-m", "pytest", TMP_TEST_PATH], capture_output=True)
+            test_logs = test_output.stdout.decode("utf-8")
+            TEST_RESULT = False
+            if "passed" in test_logs and "failed" not in test_logs:
+                TEST_RESULT = True
 
             # Remove temp directory when done
             rmtree(CLONE_DIR)
