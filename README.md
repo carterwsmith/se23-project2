@@ -53,3 +53,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+
+## Contributors
+
+- David Kaméus 
+- Minhao Ni
+- Alexander Gustavsson
+- Carter Smith
+- Sanjin Redzepagic
+
+## Contributions
+- Sanjin Redzepagic
+
+- Minhao Ni
+    
+
+- Alexander Gustavsson
+    - Worked on the README
+    - Filled out the essence.MD file and wrote a paragraph about the groups process
+
+- Carter Smith
+    
+
+- David Kaméus
+    
