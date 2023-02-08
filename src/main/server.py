@@ -41,8 +41,8 @@ def show_ci_history():
 def show_job_info(hash):
     """
     This funciton loads the ci info of a specific job given by the hash.
-    @param1 hash the hash/filename of a job. 
-    @return http response 200 with the info of this job as a json string
+    @param1 hash the hash/filename of a job.
+    @return http response 200 with the info of this job as an HTML string
             or http response 404 if the server has no record of this job
     """
     try:
