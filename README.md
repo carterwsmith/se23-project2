@@ -26,6 +26,9 @@ You will also need to create a `src/.env` file containing a `GITHUB_ACCESS_TOKEN
 
 To run tests locally, run `python3 -m pytest` from the root directory.
 
+### Essence
+Our group's adherence to the [Essence Standard](https://www.omg.org/spec/Essence/1.2/PDF) is documented in `essence.md`.
+
 
 ## License
 
