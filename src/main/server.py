@@ -9,7 +9,7 @@ where the change has been made.
 """
 
 from flask import Flask, make_response, request, jsonify
-from git import Repo
+from git import Repo, rmtree
 import json, os, shutil, subprocess, pytest, traceback
 
 from .utils import parse_github_payload, check_py_syntax, change_commit_status
@@ -30,7 +30,8 @@ def process_github_request():
     if "X-GitHub-Event" in request.headers and request.headers["X-GitHub-Event"] == "push":
         try:
             # Remove temp directory if it exists already, in which we need to store the cloned repo
-            if os.path.exists(CLONE_DIR): shutil.rmtree(CLONE_DIR)
+            if os.path.exists(CLONE_DIR):
+                rmtree(CLONE_DIR)
 
             # Retrieve necessary data from json payload
             payload_data = parse_github_payload(request.json)
@@ -42,6 +43,7 @@ def process_github_request():
                 CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
             )
 
+
             # Compile and check syntax of all .py files in the cloned directory
             SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
 
@@ -51,16 +53,18 @@ def process_github_request():
             TEST_RESULT = True if test_code == 0 else False
 
             # Remove temp directory when done
-            shutil.rmtree(CLONE_DIR)
+            rmtree(CLONE_DIR)
 
             # Change the commit status according to syntax check and test result
             conditions = [SYNTAX_CHECK, TEST_RESULT]
-            if all(conditions): STATUS = "success"
-            else: STATUS = "failure"
-            change_commit_status(OWNER_NAME=payload_data["owner_name"], 
-                                REPO_NAME=payload_data["repo_name"], 
-                                SHA=payload_data["sha"], 
-                                STATUS=STATUS)
+            if all(conditions):
+                STATUS = "success"
+            else:
+                STATUS = "failure"
+            change_commit_status(OWNER_NAME=payload_data["owner_name"],
+                                 REPO_NAME=payload_data["repo_name"],
+                                 SHA=payload_data["sha"],
+                                 STATUS=STATUS)
 
             return make_response(jsonify(payload_data), 200)
         except Exception as e:
