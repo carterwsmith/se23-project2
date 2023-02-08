@@ -1,5 +1,5 @@
 import pytest
-from ..main.dummy import TEST_BOOL, TEST_STRING
+from src.main.dummy import TEST_BOOL, TEST_STRING
 
 def test_dummy_bool():
     assert TEST_BOOL == True

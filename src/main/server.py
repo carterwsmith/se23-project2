@@ -10,9 +10,9 @@ where the change has been made.
 
 from flask import Flask, make_response, request, jsonify
 from git import Repo, rmtree
-import json, os, shutil, subprocess, pytest, traceback
+import json, os, shutil, subprocess, pytest, sys, traceback
 
-from .utils import parse_github_payload, check_py_syntax, change_commit_status
+from utils import parse_github_payload, check_py_syntax, change_commit_status
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
@@ -47,10 +47,18 @@ def process_github_request():
             # Compile and check syntax of all .py files in the cloned directory
             SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
 
+            # Rename tests to avoid import errors
+            #sys.path.append(CLONE_DIR)
+            TMP_TEST_PATH = CLONE_DIR + "src/test"
+            #test_paths = [f for f in os.listdir(TMP_TEST_PATH) if os.path.isfile(os.path.join(TMP_TEST_PATH, f)) and f.endswith('.py') and f.startswith('test_')]
+            #for i, p in enumerate(test_paths):
+            #    os.rename(TMP_TEST_PATH + "/" + p, TMP_TEST_PATH + "/" + "test_tmp" + str(i) + ".py")
+
             # Invoke tests with subprocess and get result of the tests
-            tmp_test_path = CLONE_DIR + "src/test"
-            test_code = pytest.main([tmp_test_path])
-            TEST_RESULT = True if test_code == 0 else False
+            test_output = subprocess.run(["python", "-m", "pytest", TMP_TEST_PATH], capture_output=True)
+            TEST_RESULT = False
+            if "passed" in test_output.stdout.decode("utf-8") and "failed" not in test_output.stdout.decode("utf-8"):
+                TEST_RESULT = True
 
             # Remove temp directory when done
             rmtree(CLONE_DIR)
