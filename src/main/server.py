@@ -16,15 +16,18 @@ from .utils import parse_github_payload, check_py_syntax, change_commit_status, 
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
-HISTORY_FILE = "./ci.history"
+HISTORY_DIR = "./history"
+HISTORY_FILE = "ci.history"
 
 
-"""
-This function implements the <url>/history page, which shows the results of CI jobs the server has performed.
-@return http response 200 with the history on record or http response 400 if there is none
-"""
 @app.route("/history", methods=["GET"])
 def show_ci_history():
+    """
+    This function implements the <url>/history page, which shows the results of
+    CI jobs the server has performed.
+    @return http response 200 with the history on record
+            or http response 400 if there is none
+    """
     try:
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             records = f.readlines()
@@ -33,6 +36,20 @@ def show_ci_history():
     except OSError:  # file doesn't exist
         return make_response("No history available", 400)
 
+
+@app.route("/history/<str:hash>", methods=["GET"])
+def show_job_info(hash):
+    """
+    This funciton loads the ci info of a specific job given by the hash.
+    @param1 hash the hash/filename of a job. 
+    @return http response 200 with the info of this job as a json string
+            or http response 404 if the server has no record of this job
+    """
+    try:
+        with open(HISTORY_DIR + f"/{hash}", "r", encoding="utf-8") as f:
+            return make_response(f.readall(), 200)
+    except OSError:
+        return make_response("Job not found", 404)
 
 
 """
@@ -60,7 +77,6 @@ def process_github_request():
                 CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
             )
 
-
             # Compile and check syntax of all .py files in the cloned directory
             SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
 
@@ -68,6 +84,7 @@ def process_github_request():
             tmp_test_path = CLONE_DIR + "src/test"
             test_code = pytest.main([tmp_test_path])
             TEST_RESULT = True if test_code == 0 else False
+            test_logs = ""
 
             # Remove temp directory when done
             rmtree(CLONE_DIR)
@@ -83,7 +100,7 @@ def process_github_request():
                                  SHA=payload_data["sha"],
                                  STATUS=STATUS)
 
-            store_ci_result(HISTORY_FILE, request.json, STATUS)
+            store_ci_result(HISTORY_DIR, HISTORY_FILE, request.json, test_logs, STATUS)
 
             return make_response(jsonify(payload_data), 200)
         except Exception as e:
