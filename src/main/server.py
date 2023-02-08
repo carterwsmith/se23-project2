@@ -43,17 +43,16 @@ def process_github_request():
                 CLONE_URL, CLONE_DIR, branch=COMMIT_BRANCH
             )
 
+            # Change commit status to pending when building and testing
+            change_commit_status(OWNER_NAME=payload_data["owner_name"],
+                                 REPO_NAME=payload_data["repo_name"],
+                                 SHA=payload_data["sha"],
+                                 STATUS="pending")
 
             # Compile and check syntax of all .py files in the cloned directory
             SYNTAX_CHECK = check_py_syntax(F_PATH=CLONE_DIR)
-
-            # Rename tests to avoid import errors
-            #sys.path.append(CLONE_DIR)
             TMP_TEST_PATH = CLONE_DIR + "src/test"
-            #test_paths = [f for f in os.listdir(TMP_TEST_PATH) if os.path.isfile(os.path.join(TMP_TEST_PATH, f)) and f.endswith('.py') and f.startswith('test_')]
-            #for i, p in enumerate(test_paths):
-            #    os.rename(TMP_TEST_PATH + "/" + p, TMP_TEST_PATH + "/" + "test_tmp" + str(i) + ".py")
-
+            
             # Invoke tests with subprocess and get result of the tests
             test_output = subprocess.run(["python", "-m", "pytest", TMP_TEST_PATH], capture_output=True)
             TEST_RESULT = False
