@@ -79,7 +79,9 @@ SOFTWARE.
     - Filled out the essence.MD file and wrote a paragraph about the groups process
 
 - Carter Smith
-    
+    - Set up pip env, Flask boilerplate
+    - Implemented payload parsing in `utils.py`
+    - Implemented GitHub commit status changes
 
 - David Kaméus
     
