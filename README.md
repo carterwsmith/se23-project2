@@ -25,3 +25,5 @@ To host the server yourself, use `ngrok http {PORT}` and copy the forwarding URL
 You will also need to create a `src/.env` file containing a `GITHUB_ACCESS_TOKEN` variable with `repo:status` permission to set the commit status.
 
 To run tests locally, run `python3 -m pytest` from the root directory.
+
+To access CI job history, visit [<the server http url>/history](set.this.up/before/presentation)
