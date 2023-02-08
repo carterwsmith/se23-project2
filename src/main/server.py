@@ -12,7 +12,7 @@ from flask import Flask, make_response, request, jsonify
 from git import Repo
 import json, os, shutil, subprocess, pytest, traceback
 
-from utils import parse_github_payload, check_py_syntax, change_commit_status
+from .utils import parse_github_payload, check_py_syntax, change_commit_status
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
@@ -47,10 +47,8 @@ def process_github_request():
 
             # Invoke tests with subprocess and get result of the tests
             tmp_test_path = CLONE_DIR + "src/test"
-            test_output = subprocess.run(["python3", "-m", "pytest", tmp_test_path], capture_output=True)
-            TEST_RESULT = False
-            if "passed" in test_output.stdout.decode("utf-8") and "failed" not in test_output.stdout.decode("utf-8"):
-                TEST_RESULT = True
+            test_code = pytest.main([tmp_test_path])
+            TEST_RESULT = True if test_code == 0 else False
 
             # Remove temp directory when done
             shutil.rmtree(CLONE_DIR)
