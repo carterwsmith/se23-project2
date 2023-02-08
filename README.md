@@ -84,4 +84,6 @@ SOFTWARE.
     - Implemented GitHub commit status changes
 
 - David Kaméus
-    
+    - Imported essence.md and initial documentation
+    - Implemented CI job history features
+    - Fixed windows related bugs
