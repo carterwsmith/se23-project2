@@ -12,10 +12,27 @@ from flask import Flask, make_response, request, jsonify
 from git import Repo, rmtree
 import json, os, shutil, subprocess, pytest, traceback
 
-from .utils import parse_github_payload, check_py_syntax, change_commit_status
+from .utils import parse_github_payload, check_py_syntax, change_commit_status, store_ci_result
 
 app = Flask(__name__)
 CLONE_DIR = "./tmp/"
+HISTORY_FILE = "./ci.history"
+
+
+"""
+This function implements the <url>/history page, which shows the results of CI jobs the server has performed.
+@return http response 200 with the history on record or http response 400 if there is none
+"""
+@app.route("/history", methods=["GET"])
+def show_ci_history():
+    try:
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            records = f.readlines()
+            vis = "<br/>".join(records)
+            return make_response(vis, 200)
+    except OSError:  # file doesn't exist
+        return make_response("No history available", 400)
+
 
 
 """
@@ -65,6 +82,8 @@ def process_github_request():
                                  REPO_NAME=payload_data["repo_name"],
                                  SHA=payload_data["sha"],
                                  STATUS=STATUS)
+
+            store_ci_result(HISTORY_FILE, request.json, STATUS)
 
             return make_response(jsonify(payload_data), 200)
         except Exception as e:

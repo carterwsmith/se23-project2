@@ -26,6 +26,24 @@ def check_py_syntax(F_PATH):
     return True
 
 
+def store_ci_result(filename, webhook_json, result):
+    """
+    This function writes the result of a CI job to the end of a given file,
+    formatted as one line of HTML.
+    @param1 filename the path to the file in which to store the result.
+    @param2 webhook_json the dicitonary/JSON passed from the webhook.
+    @param3 result the result of the syntax and test checks on the repo. Either "succes" or "failure".
+    """
+    commit_info = webhook_json["head_commit"]
+    color = "color:Green;" if result == "success" else "color:Red;"
+    # "a+" should guarantee that the file is created if it doesn't exist
+    with open(filename, "a+", encoding="utf-8") as f:
+        f.write(f'<p style=\"display:inline\">'
+                f'<a href=\"{commit_info["url"]}\">{commit_info["id"]}</a> '
+                f'by {commit_info["author"]["username"]}: '
+                f'<span style=\"{color}\">{result}</span></p>\n')
+
+
 """
 This function takes json payload as input, and trys to retrieve the needed information into a dictionary. 
 It raises an exception if the data extraction fails. 
