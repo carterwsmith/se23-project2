@@ -1,5 +1,5 @@
 """
-This Python file implements the utility functions which are essential for the 3 core features of the
+Implements the utility functions which are essential for the 3 core features of the
 CI server.
 """
 
@@ -53,7 +53,7 @@ def parse_github_payload(json):
 
 
 """
-This function takes 
+This function takes data to locate the github commit as input and changes the commit status
 @param1 OWNER_NAME the name of the repository owner
 @param2 REPO_NAME the name of the repository
 @param3 SHA the exclusive sha for each commit
