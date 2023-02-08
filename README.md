@@ -7,6 +7,23 @@ Basic continuous integration server for course DD2480
 
 With python (>=3.7) installed, clone the repository. 
 
+#### Assumptions
+
+We assume the structure of the repos the server tests looks as follows:
+
+```
+root/
+├─ src/
+│  ├─ main/
+│  │  ├─ *.py
+│  ├─ test/
+│  │  ├─ test_*.py
+```
+
+Client repositories must not rely on any external dependencies that would need to be installed via `pip`
+
+The host machine must also be able to run `python` and not rely on it being called `python3` or such.
+
 #### Dependencies
 
 Install dependencies with `pip install -r src/requirements.txt`.
@@ -24,6 +41,6 @@ To host the server yourself, use `ngrok http {PORT}` and copy the forwarding URL
 
 You will also need to create a `src/.env` file containing a `GITHUB_ACCESS_TOKEN` variable with `repo:status` permission to set the commit status.
 
-To run tests locally, run `python3 -m pytest` from the root directory.
+To run tests locally, run `python -m pytest` from the root directory.
 
-To access CI job history, visit [<the server http url>/history](set.this.up/before/presentation)
+To access CI job history, visit the `/history` route of the server.
