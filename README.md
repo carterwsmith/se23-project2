@@ -1,4 +1,4 @@
-# se23-project2
+# se23-project
 Basic continuous integration server for course DD2480
 
 ## CI Server v0.1.0
