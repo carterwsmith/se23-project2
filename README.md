@@ -70,7 +70,9 @@ SOFTWARE.
 
 ## Contributions
 - Sanjin Redzepagic
-
+    - Worked on the commit status function
+    - Worked on the testing, testing functions
+    
 - Minhao Ni
     - Wrote documentation for the application files
 
