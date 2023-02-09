@@ -35,9 +35,20 @@ Depending on your machine, you may need to use `pip3`.
 
 To activate the CI when already hosted, push a change to the repository.
 
-To access CI job history, visit the `/history` route of the server.
+##### Compilation / Syntax Check
+The server uses the `pycompile` module to build and check the syntax of the cloned repository.
 
-To read documentation in a browsable format, run `python -m pydoc -b`.
+##### Testing
+The server uses the `pytest` module to test the repository using files in the `src/test` directory.
+Test files must be named `test_*.py`
+
+##### Notification
+The server uses GitHub commit statuses to report the state of the CI build.
+Successes are documented with a green check mark, failures with a red X, and pending status with a yellow circle.
+
+**(P+)** To access CI job history, visit the `/history` route of the server.
+
+To read documentation in a browsable format, run `python -m pydoc -b` from the `src/main` directory.
 
 #### Hosting
 
@@ -47,16 +58,13 @@ To host the server yourself, use `ngrok http {PORT}` and copy the forwarding URL
 
 You will also need to create a `src/.env` file containing a `GITHUB_ACCESS_TOKEN` variable with `repo:status` permission to set the commit status.
 
-
 To run tests locally, run `python -m pytest` from the root directory.
 
 ## Testing 
-
-Features were tested with one positive test case per item being tested
+Features were tested with one positive test case per item being tested.
 
 ### Essence
 Our group's adherence to the [Essence Standard](https://www.omg.org/spec/Essence/1.2/PDF) is documented in `essence.md`.
-
 
 ## License
 
