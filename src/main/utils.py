@@ -106,7 +106,8 @@ def change_commit_status(OWNER_NAME, REPO_NAME, SHA, STATUS):
 
     url = 'https://api.github.com/repos/'+OWNER_NAME+'/'+REPO_NAME+'/statuses/'+SHA
     if STATUS == "success": payload = {"state" : STATUS, "description" : "The build and tests succeeded."}
-    else: payload = {"state" : STATUS, "description" : "The build or tests failed."}
+    elif STATUS == "failure": payload = {"state" : STATUS, "description" : "The build or tests failed."}
+    else: payload = {"state" : STATUS, "description" : "The build and testing is pending."}
     headers = {"Authorization" : f"token {TOKEN}"}
 
     req = requests.post(url, json = payload, headers = headers)
